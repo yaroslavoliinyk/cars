@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Body, status, HTTPException
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from typing import Optional, List
+from bson import ObjectId
 
 from models import CarBase, CarDB, CarUpdate
 
@@ -48,9 +49,9 @@ async def create_car(request: Request, car: CarBase = Body(...)):
 
 @router.get("/{id}", response_description="Get a single car")
 async def show_car(id: str, request: Request):
-    if (car := await request.app.mongodb["cars"].find_one({"_id": id})) is not None:
+    if (car := await request.app.mongodb["cars"].find_one({"_id": ObjectId(id)})) is not None:
         return CarDB(**car)
-    raise HTTPException(status_code=404, detail=f"Car with {id} not found")
+    raise HTTPException(status_code=404, detail=f"Car with {ObjectId(id)} not found")
 
 
 @router.patch("/{id}", response_description="Update car")
